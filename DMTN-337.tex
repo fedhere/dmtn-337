@@ -70,7 +70,7 @@ Additionally, DMTN-102 ``is a requirement that the Data Management System be cap
 
 To help meet these requirements, we developed a light Convolutional Neural Network that takes as input the postage stamps: template, science, and difference, outputs of the Difference Image Analysis Pipeline, and returns the reliability score (Real/Bogus score), a number between 0 and 1. This is a supervised machine learning model, where the labels for each triplet of postage stamps are either Real or Bogus. The labels are gathered with a combination of fake injection, labels obtained by analyzing the classification given by volunteers, and also by Rubin Observatory members at a Zooniverse citizen science project called Rubin Difference Detectives. This note reports the performance of that classifier.
 
-The set of weights that generate the reliability score has been updated three times; for each update, the model architecture remains the same, but a different dataset was used. Each version of the reliability model is explained in \autoref{tab:model_version}.
+The set of weights that generate the reliability score has been updated three times; for each update, the model architecture remains the same, but a different dataset was used. Each version of the reliability model is detailed in \autoref{tab:model_version}.
 \begin{table}[htb!]
     \centering
     \begin{tabular}{|p{3cm}|p{5cm}|p{2cm}|p{3cm}|p{3cm}|c|}
@@ -104,24 +104,24 @@ and the first fully connected layer, while a sigmoid function is used for the ou
 
 \section{Data}\label{sec:data}
 
-The data used to train the model has been in constant evolution, adjusting it every time to the most recent status of the telescope and data pipelines. For each model update, a specific dataset was used for training. Here, we described the three datasets used for each model update, 
+The data to train the model has been in constant evolution, adjusting it every time to the most recent status of the telescope and data pipelines. For each model update, a specific dataset was used for training. Here, we described the three datasets used for each model update.
 
 \subsection{Data for DP1 model: LSSTComCam data}
 
 The model was initially trained with 89,066 Real and the same amount of Bogus, extracted from DC2 simulations, plus random injections of stars to increase the number of Real. Once the LSSTComCam data were available, the model was fine-tuned on a subset of the data containing 183,046 sources with PSF injections. The fine-tuned model was the one used to generate reliability scores for \cite[DP1]{RTN-095}. 
 
-\subsection{Data for DP2 model}
+\subsection{Data for v0.2 and DP2 model}
 
-DP2 training relies 100\% on real (without fake injection) data and Real/Bogus labels obtained by the Zooniverse community through the `Rubin Difference Detectives' project. The fine-tuned model was the one used to generate reliability scores for DP2.
+DP2 (v0.2) training partially (totally) relies on real (without fake injection) data and Real/Bogus labels obtained by the Zooniverse community through the `Rubin Difference Detectives' project. The fine-tuned model was the one used to generate reliability scores for DP2.
 
 \subsubsection{Rubin Difference Detectives: Zooniverse Citizen Science Project}\label{sec:zooniverse}
 
-Rubin Difference Detectives was launched on November 11th, 2025, with 242,391 DIA Sources for the Zooniverse community to label. The distribution of the DIA sources per catalog is described in \autoref{tab:list_data}.
+Rubin Difference Detectives was launched on November 11th, 2025, with 242,391 DIA Sources (a subject in Zooniverse terms) for the Zooniverse community to label. The distribution of the DIA sources per catalog is described in \autoref{tab:list_data}.
 
 \begin{table}[]
 
     \centering
-    \begin{tabular}{|c|c|c|c|}
+    \begin{tabular}{|c|c|c|c|c|}
     \hline
         \textbf{Name} & \textbf{Num sources} & \textbf{Pipeline} & \textbf{Type}  \\ \hline
       
@@ -149,7 +149,7 @@ The subject given by the community was an image composed of three postage stamps
 \end{figure}
 
 
-For a subject to be retired, meaning volunteers can no longer see it, it must first have been classified as either Real or Bogus by two different volunteers, and they must have been in complete agreement. If this initial condition was not met, the subject was instead classified by seven different volunteers.
+For a subject to be retired, meaning volunteers can no longer see it, it must first have been classified as either Real or Bogus by two different volunteers, and they must have been in complete agreement. If this initial condition was not met, the subject was instead classified by seven different volunteers. The following section describes how the classifications given to a DIA source were used to determine the final Real or Bogus label, which, in the end, corresponded to the ground truth labels to train the reliability score model.
 
 
 
@@ -160,9 +160,9 @@ For a subject to be retired, meaning volunteers can no longer see it, it must fi
 The methodology we used to understand the classifications made by the volunteers and estimate the Real/Bogus classifier performance of the Rubin Difference Detectives project was the same as that defined and implemented by \cite{marshall2016space}. The labels obtained through this method are then the training/validation and testing labels to fine-tune the ML-reliability model. 
 In their work, they implemented a probabilistic classification for each subject ($\text{Pr}(\text{Real})$: probability of the DIA source to be a Real astrophysical object); the classifier was based on all the classifications given to the subject. Their probabilistic methodology depended on understanding how the volunteers responded to the reference data set (subjects where the ground truth was known). The probabilistic classifier is explained in great detail in \cite{marshall2016space}. We refer the reader to their paper.
 
-Our reference data set was composed of either the DIA sources classified by the Oxford team (8 experts from the University of Oxford who classified a fraction of the DIA sources in Zooniverse) or the DIA sources classified by the Rubin-ML-Reliability team, or both. The reference set had a total of 20,261 (Real: 8576, Bogus: 11,686) DIA sources, when considering both training datasets, and a total of 8956 (Real: 3805, Bogus: 5151)  DIA sources, when considering only the Rubin-ML-Reliability team.  We note here that we only consider volunteers who provided labels for the reference set. From 3750 volunteers, only 2476 encountered a DIA source of the Rubin-ML-Reliability team reference data set (2792 when considering both reference data sets). 
+Our reference data set was composed of either the DIA sources classified by the Oxford team (8 experts from the University of Oxford who classified a fraction of the DIA sources in Zooniverse) or the DIA sources classified by the Rubin-ML-Reliability team, or both. The reference set had a total of 20,261 (Real: 8576, Bogus: 11,686) DIA sources, when considering both reference datasets, and a total of 8956 (Real: 3805, Bogus: 5151)  DIA sources, when considering only the Rubin-ML-Reliability team.  We note here that we only consider volunteers who provided labels for the reference set. From 3750 volunteers, only 2476 encountered a DIA source of the Rubin-ML-Reliability team reference data set (2792 when considering both reference datasets). 
 
-Since the $\text{Pr}(\text{Real})$ per DIA source returns a float between 0 and 1, to determine the final binary classification (Real = 1 or Bogus = 0), we define two different scenarios. 
+Since the $\text{Pr}(\text{Real})$ per DIA source returned a float between 0 and 1, to determined the final binary classification (Real = 1 or Bogus = 0), we defined two different scenarios. 
 \begin{enumerate}
     \item \textit{stable set}: A source is considered stable if (1) the probability of being Real, $\text{Pr}(\text{Real})$, meets a threshold ($\geq 0.90$ for Real, $\leq 0.10$ for Bogus) and (2) this condition holds for at least the last three classifications.
     \item \textit{unstable set}: Only the threshold condition applies, without the stability criterion.
@@ -178,7 +178,7 @@ In \autoref{fig:tptn_ratio_users}, we showed the True Positives (TP) and True Ne
 \end{figure}
 
 The distribution of Real/Bogus for the reference data changes depending on the type of source, and it is also related to the Signal to Noise Ratio (SNR) of the DIA source. Visual inspection of some DIA sources labeled by experts and 
-\autoref{fig:gt_snr_byset} showed that low SNR tends to be classified as Bogus, regardless of the type of source.
+\autoref{fig:gt_snr_byset} showed that low SNR tends to be classified as Bogus, regardless of the type of source (gaia, galaxy, reliability\_cuts, ss, or tns).
 
 \begin{figure}[htb!]
     \centering
@@ -187,7 +187,7 @@ The distribution of Real/Bogus for the reference data changes depending on the t
     \label{fig:gt_snr_byset}
 \end{figure}
 
-Using these volunteer classifications, we constructed balanced datasets for model training.
+% Using these volunteer classifications, we constructed balanced datasets (same amount of Real and Bogus) for model training.
 
 % \subsection{Final Data Description}
 After applying the Bayesian approach (\cite{marshall2016space}) to the Zooniverse classification, the data distribution is described in \autoref{tab:total_data_zoo_analysis}.
@@ -216,10 +216,7 @@ The total number of Real and Bogus after the classification analysis is unbalanc
 \label{fig:posterior_byset}
 \end{figure}
 
-
-
-
-The construction of the ground truth labels for fine-tuning the model for DP2 relied on the Zooniverse analysis obtained by only considering the reference data set of the  Rubin-ML-Reliability team (see \autoref{tab:total_data_zoo_analysis}). Additionally, only detections with high-confidence labels (stable) were used. In total, 13,178 sources were used to fine-tune the DP1 model: 6,630 Real and 6,548 Bogus. 1,647 were used to validate, and another 1,647 to test the model. Given the small size of the training data set, in addition to the original images, two augmentations (vertical and horizontal flipping) were added to the training.
+The construction of the ground truth labels for fine-tuning the model for v0.2 and DP2 models relied on the Zooniverse analysis obtained by only considering the reference data set of the  Rubin-ML-Reliability team (see \autoref{tab:total_data_zoo_analysis}). Additionally, only detections with high-confidence labels (stable) were used. In total, 13,178 sources were used to fine-tune the DP1 model: 6,630 Real and 6,548 Bogus. 1,647 were used to validate, and another 1,647 to test the model. Given the small size of the training data set, in addition to the original images, two augmentations (vertical and horizontal flipping) were added to the training. For DP2, a fraction of the dataset used for DP1 model (LSSTComCam fakes) was also used. For v0.2 the training relies 100\% on the Zooniverse data.
 
 
 
@@ -236,7 +233,7 @@ The construction of the ground truth labels for fine-tuning the model relied on 
 
 The distribution of the reliability score for a random set of DIA sources is shown in \autoref{fig:distribution_rel_score_versions}. Besides the peaks at $0$ and $1$, each model presents a third peak at $\sim 0.5$ for DP1 model, and $\sim 0.3$ for both the DP2 and v0.2 models. The peak corresponds to when the science and difference images contain some rows or columns full of NaN values. 
 
-Given the high volume of DIA sources at the moment, and to mitigate the impact on APDB, for each model, a reliability value cutoff is implemented. The cutoff is determined by analyzing the behavior of the model against properties of the DIA sources, and behavior on fakes, e.g. \autoref{fig:psf/psferr_rel}, \autoref{fig:st_apflux}. The idea is to minimize the amount of Bogus that reaches the Brokers and the scientific community. The cutoff values are 0.1, 0.5, and 0.5 for DP1 model, v0.2, and DP2 model, respectively.
+Given the high volume of DIA sources at the moment, and to mitigate the impact on APDB, for each model, a reliability value cutoff is implemented. The cutoff is determined by analyzing the behavior of the model against properties of the DIA sources, and behavior on fakes, e.g. \autoref{fig:cosmos_compare_models}, \autoref{fig:psf/psferr_rel}, \autoref{fig:st_apflux}. The idea is to minimize the amount of Bogus that reaches the Brokers and the scientific community. The cutoff values are 0.1, 0.5, and 0.5 for DP1 model, v0.2, and DP2 model, respectively.
 
 \begin{figure}[htb!]
     \centering
@@ -245,7 +242,7 @@ Given the high volume of DIA sources at the moment, and to mitigate the impact o
     \label{fig:distribution_rel_score_versions}
 \end{figure}
 
-The behavior of each model against SNR for a fake injection run outside of the training data set is shown in \autoref{fig:cosmos_compare_models}. DP1 model was trained only using fakes; on the other hand, for the other two models, real data, without fake injections, was also used as part of the training set. 
+The behavior of each model against SNR for a fake injection run outside of the training data set is shown in \autoref{fig:cosmos_compare_models}. DP1 model was trained only using fakes; v0.2 was only trained with real data without fake injection, and the DP2 model was trained with both fakes and real data. 
 
 \begin{figure}[htb!]
     \centering
@@ -298,7 +295,7 @@ Following the basic idea behind the Difference Image Analysis (DIA), where the f
 More details about the performance for each version are described in the following sections.
 
 \subsection{DP1 model (v0.1)}
-The DC2 model achieved a purity of 98.90\% and completeness of 97.00\% in the test dataset.
+The DP1 model achieved a purity of 98.90\% and completeness of 97.00\% in the test dataset.
 On the LSSTComCam test set, the model achieved an accuracy of 98.06\%, purity
 of 97.87\%, and completeness of 98.27\%. The weights up to this point were the ones used to generate the reliability score on DP1 data \cite[DP1]{RTN-095}. As reported in \cite[DP1]{RTN-095}, and shown in \autoref{tab:classification_results_dp1}, after applying a threshold of 0.5 to the reliability score, the purity of transient detections is high, but it had a limited impact on variable stars. 
 
@@ -315,7 +312,7 @@ Variables & 3.5\% & 96.5\% & 316 \\ \hline
 \end{tabular}
 \end{table}
 
-The DP1 model tested against a fake injection run outside of the training data set is shown in \autoref{fig:cosmos_dp21}.
+The DP1 model tested against a fake injection run outside of the training data set is shown in \autoref{fig:cosmos_dp1}.
 \begin{figure}
     \centering
 \includegraphics[width=0.6\linewidth]{figures/cosmos_dp1_model.png}
@@ -345,7 +342,7 @@ The reliability score distribution per data catalog is shown in \autoref{fig:dis
 \end{figure}
 
 
-The DP2 model reached a purity $\geq 95\%$ and completeness $\geq 90\%$ with threshold values between $0.808 \leq$threshold $\leq 0.833$ for the test data without fake injections. For the LSSTComcam fakes test data, the model reached a purity $\geq 95\%$ and completeness $\geq 90\%$, are obtained with values between $0.129 \leq $ threshold $\leq 0.899$. \autoref{fig:dp2_performance} shows the full purity and completeness curves.
+The DP2 model reached a purity $\geq 95\%$ and completeness $\geq 90\%$ with threshold values between $0.808 \leq$threshold $\leq 0.833$ for the test data without fake injections. For the LSSTComcam fakes test data, the model reached a purity $\geq 95\%$ and completeness $\geq 90\%$, which are obtained with values between $0.129 \leq $ threshold $\leq 0.899$. \autoref{fig:dp2_performance} shows the full purity and completeness curves.
 
 \begin{figure*}[htb!]
    \centering
