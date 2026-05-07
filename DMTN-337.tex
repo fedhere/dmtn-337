@@ -1,4 +1,5 @@
-\documentclass[DM,lsstdraft,authoryear,toc]{lsstdoc}
+% \documentclass[DM,lsstdraft,authoryear,toc]{lsstdoc}
+\documentclass[DM,authoryear,toc]{lsstdoc}
 \input{meta}
 
 % Package imports go here.
@@ -40,7 +41,7 @@
 % \setDocCurator{The Curator of this Document}
 
 \setDocAbstract{%
-This document summarizes the status of the reliability Machine Learning Reliability model (also known as "\texttt{Real}/\texttt{Bogus}") for LSST alerts stream. The model associates to each Difference Image Analysis (DIA) detection a $\rel\in[0-1]$ score designed to measure the likelihood of the veracity of the detection, \emph{i.e.}, astrophysical source (1) \emph{vs} artifact (0). This manuscript documents the architecture and performance of each version of the model, including specific performance characteristics, identified weaknesses and failure modes, mitigation strategies, and details of the training set.
+This document summarizes the status of the Machine Learning Reliability model (also known as "\texttt{Real}/\texttt{Bogus}") for the LSST alerts stream. The model associates to each Difference Image Analysis (DIA) detection a $\rel\ [0-1]$ score designed to measure the likelihood of the veracity of the detection, \emph{i.e.}, astrophysical source (1) \emph{vs} artifact (0). This manuscript documents the architecture and performance of each model version, including specific performance characteristics, identified weaknesses and failure modes, mitigation strategies, and details of the training set.
 }
 
 % Change history defined here.
@@ -48,7 +49,7 @@ This document summarizes the status of the reliability Machine Learning Reliabil
 % Fields: VERSION, DATE, DESCRIPTION, OWNER NAME.
 % See LPM-51 for version number policy.
 \setDocChangeRecord{%
-  \addtohist{1}{YYYY-MM-DD}{Unreleased.}{Acero-Cuellar}
+  \addtohist{1}{2026-05-07}{Initial Release.}{Acero-Cuellar}
 }
 
 
