@@ -40,7 +40,7 @@
 % \setDocCurator{The Curator of this Document}
 
 \setDocAbstract{%
-Status of the reliability classifier ("\texttt{Real}/\texttt{Bogus}")
+This document summarizes the status of the reliability Machine Learning Reliability model (also known as"\texttt{Real}/\texttt{Bogus}") for LSST alerts stream. The model associates to each Difference Image Analysis (DIA) detection a $\rel\in[0-1]$ score designed to measure the likelihood of the veracity of the detection, \emph{i.e.}, astrophysical source (1) \emph{vs} artifact (0). This manuscript documents the architecture and performance of each version of the model, including specific performance characteristics, identified weaknesses and failure modes, mitigation strategies, and details of the training set.
 }
 
 % Change history defined here.
@@ -81,7 +81,7 @@ Additionally, from \cite{DMTN-102} ``It is a requirement that the Data Managemen
 
 To help meet these requirements, we developed a light Convolutional Neural Network that takes as input the postage stamps: template, science, and difference, as they are produced by the Difference Image Analysis (DIA) Pipeline, and returns a reliability score, \rel, (a.k.a, \texttt{Real}/\texttt{Bogus} score), as a number between 0 and 1. This is a supervised machine learning model, a binary classifier where the labels for each triplet of postage stamps are either \texttt{Real} or \texttt{Bogus}. The labels are gathered with a combination of fake injection, and labeled detections obtained by analyzing classifications given by volunteers, both Rubin Observatory members and citizen scientists participating in the Zooniverse\footnote{\url{https://www.zooniverse.org/}.}  project called `Rubin Difference Detectives'.\footnote{\url{https://www.zooniverse.org/projects/ebellm/rubin-difference-detectives}.} This note reports the performance of that classifier, the `Rubin Machine Learning (ML)-reliability model'.
 
-The set of model weights that generate the reliability score has been updated three times as of April 2026. While the model architecture remains the same, the weights are produced by training, retraining, or fine-tuning on different datasets. Each version of the reliability model is detailed in \autoref{tab:model_version}, \autoref{tab:model_version_cont}.\footnote{By `fine-tuning' here we refer to the practice of retraining a model starting training from the weights set in previous models.}
+The set of model weights that generates the reliability score has been updated three times as of April 2026. While the model architecture remains the same, the weights are produced by training, retraining, or fine-tuning on different datasets. Each version of the reliability model is detailed in \autoref{tab:model_version}, \autoref{tab:model_version_cont}.\footnote{By `fine-tuning' here we refer to the practice of retraining a model starting training from the weights set in previous models.}
 
 \newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
 \begin{table}[htb!]
@@ -134,13 +134,13 @@ The data to train the model has been in constant evolution, adjusting it every t
 
 The ML-Reliability model was initially trained with 89,066 \texttt{Real} and the same amount of \texttt{Bogus} labels, extracted from the Data Challenge 2 simulations \cite[DC2,][]{2021arXiv210104855L}, plus random injections of stars (i.e., PSFs at random locations without Galaxy associations) to increase the number of \texttt{Real}. Once the LSSTComCam data became available, the model was fine-tuned on a subset of that data containing 183,046 postage stamps with PSF injections. This fine-tuned model was the one used to generate reliability scores for Data Preview 1 \cite[DP1,][]{RTN-095} and is tagged \V1. 
 
-\subsection{Data for \V2 and \V3 (DP2) models: LSSTCam and Zooniverse}
+\subsection{Data for \V2 and \V3 (DP2) model: LSSTCam and Zooniverse}
 
 The model was retrained (fine-tuned) to improve performance on the commissioning LSSTCam data that will eventually be released as Data Preview 2 \cite[DP2][]{RTN-111}, leading to model version \V3. The \V2 model, as of April 2026, is being used for the AP pipeline and the production of alerts. The training of \V3, and \V2 relies partially and totally, respectively, on real data (no fake injection) and \texttt{Real}/\texttt{Bogus} labels obtained by the Zooniverse citizen scientists through the `Rubin Difference Detectives' project. The fine-tuned model will be used to generate reliability scores for DP2.
  
 \subsubsection{Rubin Difference Detectives: Zooniverse Citizen Science Project}\label{sec:zooniverse}
 
-Rubin Difference Detectives was launched on November 11th, 2025, with 242,391 DIA Sources (a ``subject'' in Zooniverse terms) for the Zooniverse citizen scientists to label. The distribution of the DIA sources per catalog is described in \autoref{tab:list_data}. By associating DIA detections in LSSTCam data with various catalogs (TNS \citep{tns_cite}, Gaia \citep{rimoldini2023gaia}, Rubin Solar System catalogs), with \rel\ score between 0.5 and 0.9, \texttt{Real} labels generated by the \V1 model (subset tagged `reliability\_cuts'), and by using measured DIA source properties, we produced a dataset of DIA detections that is expected to be close to balanced in the \texttt{Real/Bogus} distribution.
+Rubin Difference Detectives was launched on November 11th, 2025, with 242,391 DIA Sources (a ``subject'' in Zooniverse terms) for the Zooniverse citizen scientists to label. The distribution of the DIA sources per catalog is described in \autoref{tab:list_data}. By associating DIA detections in LSSTCam data with various catalogs (TNS \citep{tns_cite}, Gaia \citep{rimoldini2023gaia}, Rubin Solar System catalogs), and  DIA detections with \rel\ score between 0.5 and 0.9, \texttt{Real} labels generated by the \V1 model (subset tagged `reliability\_cuts')), and by using measured DIA source properties, we produced a dataset of DIA detections that is expected to be close to balanced in the \texttt{Real/Bogus} distribution.
 
 \begin{table}
 \footnotesize
@@ -172,7 +172,9 @@ The subjects given to the citizen scientists were images composed of three posta
     \label{fig:zooniverse_screenshot}
 \end{figure}
 
-For a subject to be ``retired'', meaning volunteers can no longer see it and labels are no longer collected, it first had to have been classified as either \texttt{Real} or \texttt{Bogus} by two different volunteers in agreement. If this initial condition was not met, the subject was instead retired after having been classified by seven different volunteers. The following section describes how the classifications given to a DIA source were used to determine the final \texttt{Real} or \texttt{Bogus} label, which, in the end, corresponded to the ground truth labels to train the reliability score model.
+For a subject to be ``retired'', meaning volunteers can no longer see it and labels are no longer collected, it first had to have been classified as either \texttt{Real} or \texttt{Bogus} by two different volunteers in agreement. If this initial condition was not met, the subject was instead retired after having been classified by seven different volunteers. 
+
+The following section describes how the classifications given to a DIA source were used to determine the final \texttt{Real} or \texttt{Bogus} label, which, in the end, corresponded to the ground truth labels to train the reliability score model.
 
 
 
@@ -183,7 +185,7 @@ For a subject to be ``retired'', meaning volunteers can no longer see it and lab
 The methodology we used to understand the classifications made by the volunteers and estimate the \texttt{Real}/\texttt{Bogus} classifier performance of the Rubin Difference Detectives project was a modification of the algorithm defined and implemented in \cite{marshall2016space}. %The labels obtained through this method are then the training/validation and testing labels to fine-tune the ML-reliability model. 
 Following this work, we implemented a probabilistic classification for each subject ($\text{Pr}(\texttt{Real})$: probability of the DIA source to be a \texttt{Real} astrophysical object). %; the classifier was based on all the classifications given to the subject. 
 Their probabilistic methodology relied on understanding how the volunteers responded to a reference data set (subjects where the ground truth was known) and thus building a prior for each user. The probabilistic classifier is explained in great detail in \cite{marshall2016space}. We refer the reader to their paper. 
-Our reference data set was composed of either the DIA sources classified by the Oxford team (8 experts from the University of Oxford who classified a fraction of the DIA sources in Zooniverse (Weston et al. in preparation), the DIA sources classified by the Rubin-ML-Reliability team (referred to as Rubin hereafter), or both. The reference set had a total of 20,261 (\texttt{Real}: 8576, \texttt{Bogus}: 11,686) DIA sources, when considering both reference datasets, and a total of 8956 (\texttt{Real}: 3805, \texttt{Bogus}: 5151)  DIA sources, when considering only the Rubin expert labels.  We note here that we only consider volunteers who provided labels for at least one subject in the reference set. At the time of training model version \V2, out of 3750 volunteers, only 2476 encountered a DIA source of the Rubin reference data set (2792 when considering both reference datasets). 
+Our reference data set was composed of either the DIA sources classified by the Oxford team (8 experts from the University of Oxford who classified a fraction of the DIA sources in Zooniverse (Weston et al. in preparation)), the DIA sources classified by the Rubin-ML-Reliability team (referred to as Rubin hereafter), or both. The reference set had a total of 20,261 (\texttt{Real}: 8576, \texttt{Bogus}: 11,686) DIA sources, when considering both reference datasets, and a total of 8956 (\texttt{Real}: 3805, \texttt{Bogus}: 5151)  DIA sources, when considering only the Rubin expert labels.  We note here that we only consider volunteers who provided labels for at least one subject in the reference set. At the time of training model version \V2, out of 3750 volunteers, only 2476 encountered a DIA source of the Rubin reference data set (2792 when considering both reference datasets). 
 
 Because the number of labels is typically much smaller in `Rubin Difference Detectives' compared to the `Space Warp' project that inspired \cite{marshall2016space}, we implement the following modifications: 
 \begin{itemize}
@@ -251,7 +253,7 @@ The total number of \texttt{Real} and \texttt{Bogus} labels after the classifica
 \label{fig:posterior_byset}
 \end{figure}
 
-The construction of the ground truth labels for fine-tuning the \V2 and \V3 models relied on the Zooniverse analysis obtained by only considering the Rubin reference data set (see \autoref{tab:total_data_zoo_analysis}). Additionally, only detections with high-confidence labels (stable) were used. In total, 13,178 sources were used to fine-tune the DP1 model: 6,630 \texttt{Real} and 6,548 \texttt{Bogus}. 1,647 were used to validate, and another 1,647 to test the model. Given the small size of the training data set, in addition to the original images, two augmentations (vertical and horizontal flipping) were added to the training. For \V3, a fraction of the dataset used for the \V1 DP1 model (LSSTComCam fakes) was also used. For \V2 the fine-tuning relies 100\% on the Zooniverse data.
+The construction of the ground truth labels for fine-tuning the \V2 and \V3 models relied on the Zooniverse analysis obtained by only considering the Rubin reference data set (see \autoref{tab:total_data_zoo_analysis}). Additionally, only detections with high-confidence labels (stable) were used. In total, 13,178 sources were used to fine-tune the \V2 and \V3 models: 6,630 \texttt{Real} and 6,548 \texttt{Bogus}. 1,647 were used to validate, and another 1,647 to test the model. Given the small size of the training data set, in addition to the original images, two augmentations (vertical and horizontal flipping) were added to the training. For \V3, a fraction of the dataset used for the \V1 DP1 model (LSSTComCam fakes) was also used. For \V2 the fine-tuning relies 100\% on the Zooniverse data.
 
 
 
