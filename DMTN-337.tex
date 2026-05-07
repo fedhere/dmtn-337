@@ -40,7 +40,7 @@
 % \setDocCurator{The Curator of this Document}
 
 \setDocAbstract{%
-This document summarizes the status of the reliability Machine Learning Reliability model (also known as"\texttt{Real}/\texttt{Bogus}") for LSST alerts stream. The model associates to each Difference Image Analysis (DIA) detection a $\rel\in[0-1]$ score designed to measure the likelihood of the veracity of the detection, \emph{i.e.}, astrophysical source (1) \emph{vs} artifact (0). This manuscript documents the architecture and performance of each version of the model, including specific performance characteristics, identified weaknesses and failure modes, mitigation strategies, and details of the training set.
+This document summarizes the status of the reliability Machine Learning Reliability model (also known as "\texttt{Real}/\texttt{Bogus}") for LSST alerts stream. The model associates to each Difference Image Analysis (DIA) detection a $\rel\in[0-1]$ score designed to measure the likelihood of the veracity of the detection, \emph{i.e.}, astrophysical source (1) \emph{vs} artifact (0). This manuscript documents the architecture and performance of each version of the model, including specific performance characteristics, identified weaknesses and failure modes, mitigation strategies, and details of the training set.
 }
 
 % Change history defined here.
@@ -285,7 +285,7 @@ The behavior of each model against SNR for a fake injection run outside of the t
 \begin{figure}[htb!]
     \centering
     \includegraphics[width=1\linewidth]{figures/cosmos_compare_models.png}
-    \caption{Reliability score against SNR for each model version for a set of fakes DIA sources in the magnitude range $m=24-21$ from an injection run outside of the training set. %\tocheck{We note a single extremely bright injection ($mag\sim20$ is assigned $\rel=0$. }
+    \caption{Reliability score against SNR for each model version for a set of fakes DIA sources in the magnitude range $m=24-21$ from an injection run outside of the training set. The horizontal dashed line indicates the \rel\ cutoff for each model version: 0.1 for \V1 and 0.5 for both \V2 and \V3.%\tocheck{We note a single extremely bright injection ($mag\sim20$ is assigned $\rel=0$. }
     }
     \label{fig:cosmos_compare_models}
 \end{figure}
